@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Корректный запуск.",
+      "setup": "make test",
+      "run": "./main",
+      "input": "",
+      "output": "The Runge-Kutta test:",
+      "comparison": "included",
+      "timeout": 360,
+      "points": 50
+    }
+  ]
+}

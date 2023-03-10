@@ -1,0 +1,8 @@
+\babel@toc {russian}{}
+\contentsline {section}{\numberline {1.\relax }Постановка задачи}{1}%
+\contentsline {section}{\numberline {2.\relax }Формализация задачи}{1}%
+\contentsline {section}{\numberline {3.\relax }Система необходимых условий оптимальности}{1}%
+\contentsline {section}{\numberline {4.\relax }Аномальный случай и исследование задачи}{2}%
+\contentsline {section}{\numberline {5.\relax }Краевая задача}{3}%
+\contentsline {section}{\numberline {6.\relax }Численное решение методом стрельбы}{3}%
+\contentsline {section}{\numberline {7.\relax }Тест решения задачи Коши:\\ гармонический осциллятор}{4}%
