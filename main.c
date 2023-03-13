@@ -223,6 +223,7 @@ void diagonal(double dist,
               unsigned int s,
               double** k,
               double** cab,
+              double tol,
               double f (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
               double g (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
               double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
@@ -234,7 +235,7 @@ void diagonal(double dist,
     double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = dist;
     double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
                 
-    for (; fabs (cos(mult * _x)) > EPS * pow(10,4);)        // finding point of crossing
+    for (; fabs (cos(mult * _x)) > tol * pow(10, 3);)        // finding point of crossing
     {
         if (cos(mult * _x) * cos(mult * *temp_x) < 0)
         {
@@ -363,8 +364,8 @@ double astep (double T,
             continue;
         }
         
-        if(print && fabs(cos(mult * *x)) > EPS * pow(10,5) && cos(mult * *x) * cos(mult * temp_x) < EPS){
-            diagonal(dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, &temp, s, k, cab, f, g, u, v, l, mult, *c);
+        if(print && fabs(cos(mult * *x)) > tol * pow(10, 4) && cos(mult * *x) * cos(mult * temp_x) < EPS){
+            diagonal(dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l, mult, *c);
 
             x_  = *x;
             y_  = *y;
@@ -467,8 +468,8 @@ int shooting_method(unsigned int max_iterations,
     err[0] = 0;
     err[1] = 0;
     double delta = pow(2, -11);
-    double step_m = pow(10, -1);
-    double step_T = pow(10, -1);
+    double step_m = pow(10, -1) * ((alpha[0]-alpha[4]>0)?-1:1);
+    double step_T = pow(10, -1) * ((alpha[1]-alpha[5]>0)?-1:1);
     double integral;
     for(;1;){
         integral = 0;
@@ -597,7 +598,7 @@ int shooting_method(unsigned int max_iterations,
             // printf("%10.2e    %10.2e  |  %10.2e\n%10.2e    %10.2e  |  %10.2e\n", A[0][0], A[0][1], B[0], A[1][0], A[1][1], B[1]);
             
             B[5] = sqrt(pow(B[0],2)+pow(B[1],2));
-            if(B[5] < tol*pow(10, 3)){
+            if(B[5] < tol * pow(10, 3)){
                 // printf and break
                 // printf("Shooting iteration: %u,\nAlpha: %.4f,\nDistance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\n\n", iteration, alpha[4], alpha[5], alpha_1, alpha_2, integral, sqrt(pow(B[0], 2) + pow(B[1], 2)));
                 
@@ -621,7 +622,7 @@ int shooting_method(unsigned int max_iterations,
                     betta *= 1.01;
                     break;
                 }
-                if(sqrt(pow(err[0],2)+pow(err[1],2))-B[5]<EPS && betta > pow(2, -15))
+                if(sqrt(pow(err[0],2)+pow(err[1],2)) - B[5] < EPS && betta > pow(2, -15))
                 {
                     B[5] = sqrt(pow(err[0],2)+pow(err[1],2));
                     betta /= 1.01;
@@ -654,18 +655,19 @@ int shooting_method(unsigned int max_iterations,
         
         
         if(fabs(alpha[0] - mult) < EPS && fabs(alpha[1] - T) < EPS) {
-            printf("\n---------------------\n");
+            printf("\n-----------------------\n");
             integral = 0;
             integral = error(alpha[5], x, alpha_1, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 1);
-            printf("Shooting iteration: %u,\nAlpha: %.4f,\nDistance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\n\n", iteration, alpha[4], alpha[5], alpha_1, alpha_2, integral, sqrt(pow(B[0], 2) + pow(B[1], 2)));
+            printf("Shooting iteration: %u,\nAlpha: %.4f,\nDistance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\n\n", iteration+1, alpha[4], alpha[5], alpha_1, alpha_2, integral, sqrt(pow(B[0], 2) + pow(B[1], 2)));
             break;
         }
         
         if((fabs(alpha[5] - alpha[1]) < pow(10, -4) && fabs(alpha[5] - alpha[1]) > EPS) || (fabs(alpha[4] - alpha[0]) < pow(10, -4) && fabs(alpha[4] - alpha[0]) > EPS)) {
+                printf("\n-----------------------------------\n");
                 printf("Newton's method does not converge!\n");
                 integral = 0;
                 integral = error(alpha[1], x, alpha[2], alpha[3], py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[0], 1);
-                printf("Shooting iteration: %u,\nAlpha: %16.4f,\nRequested alpha: %.4f,\nDistance: %16.4f,\nRequested distance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\nSteps: %.4e   %.4e\n\n", iteration, alpha[0], mult, alpha[1], T, alpha[2], alpha[3], integral, sqrt(pow(err[0], 2) + pow(err[1], 2)), step_m, step_T);
+                printf("Shooting iteration: %u,\nAlpha: %16.4f,\nRequested alpha: %.4f,\nDistance: %16.4f,\nRequested distance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\nSteps: %.4e   %.4e\n\n", iteration+1, alpha[0], mult, alpha[1], T, alpha[2], alpha[3], integral, sqrt(pow(err[0], 2) + pow(err[1], 2)), step_m, step_T);
     
                 free (A[0]);
                 free (A[1]);
@@ -712,7 +714,7 @@ int main()
     double** k;
     double** cab;
 
-    time_t start, end;
+    clock_t timer;
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -767,6 +769,9 @@ int main()
             case 5:
                 T[i] = 0.1;
                 break;
+            case 7:
+                T[i] = 0.1;
+                break;
             default:
                 T[i] = 1;
         }
@@ -776,7 +781,7 @@ int main()
     for(i=0; i < mult_c; i++){
         switch (i) {
             case 0:
-                mult[i] = 10.0;
+                mult[i] = 0.0;
                 break;
             default:
                 mult[i] = (i<=4)?pow(10,(double)i - 4.):5.*((double)i - 4.);
@@ -835,7 +840,7 @@ int main()
 	astep(pi*pow(10,3), &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, test_x_d, test_y_d, test_px_d, test_py_d, test_B_d, 1, 1, 0);
     printf("The Runge-Kutta test:\n%.2e    %.2e  |  %.2e    %.2e  |  %.7e  |  10^3*Pi\n\n", x - 1, y, px - 1, py, b);
     
-    time (&start);
+    timer = clock();
     
 	x=0;
 	y=0;
@@ -871,7 +876,7 @@ int main()
     free (k[4]);
     free (k);
 
-    time (&end);
-    printf ("%.f seconds\n", difftime (end, start));
+    timer -= clock();
+    printf ("%.5f seconds\n", ((double)-timer)/CLOCKS_PER_SEC);
     return 0;
 }
