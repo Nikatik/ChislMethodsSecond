@@ -77,51 +77,6 @@ static double contol_m (double t, double x, double y, double p_x, double p_y, do
 */
 _Pragma ("GCC diagnostic pop")
     
-    /*
-void diagonal() //finding crossing point
-{    
-    double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = *dist;
-    double _x = x, _y = y, _dist = *dist, _h = temp;
-                
-    for (; fabs (_x - *startx) > EPSM;)        // finding point of crossing
-    {
-        if ((_x - *startx) * (tempx - *startx) < 0)
-        {
-            lx = _x;
-            ly = _y;
-            ldist = _dist;
-            _h = fabs (cos(mult*_x)) / fabs (cos(mult*tempx) - cos(mult*_x)) * (*dist + temp - _dist);        // step from _x to startx
-
-            RK (_dist, &_x, &_y, _h, s, k, cab, f, g, false);
-            _dist += _h;
-        }
-        else
-        {
-            tempx = _x;
-            tempy = _y;
-            temp = _dist - *dist;
-
-            _h = fabs (cos(mult*lx)) / fabs (cos(mult*lx) - cos(mult*_x)) * (_dist - ldist);        // step from lx to startx
-
-            _x    = lx;
-            _y    = ly;
-            _dist = ldist;
-
-            RK (_dist, &_x, &_y, _h, s, k, cab, f, g, false);
-
-            _dist += _h;
-        }
-    }
-
-    tempx = x;
-    tempy = y;
-    temp  = _dist - *dist;
-
-    RK (*dist, &tempx, &tempy, temp, s, k, cab, f, g, false);        // counting startx point
-    RK (dist, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, h, s, k, cab, f, g, u, v, l, mult, *c, false);
-}
-    */
-    
 double rd (FILE* inpf)        // reading floating point number from a/b format
 {
     int chisl = 0;
@@ -251,6 +206,80 @@ void RK (double t,
 	*px0 += h * temp_px;
     *py0 += h * temp_py;      
     *b0 += h * temp_b;       
+}
+    
+void diagonal(double dist, 
+              double x, 
+              double y, 
+              double px, 
+              double py, 
+              double b, 
+              double* temp_x, 
+              double* temp_y, 
+              double* temp_px, 
+              double* temp_py, 
+              double* temp_b, 
+              double* temp, 
+              unsigned int s,
+              double** k,
+              double** cab,
+              double f (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
+              double g (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
+              double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
+              double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
+              double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
+              double mult,
+              double c (double, double, double, double, double, double)) //finding crossing point
+{    
+    double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = dist;
+    double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
+                
+    for (; fabs (cos(mult * _x)) > EPS * pow(10,3);)        // finding point of crossing
+    {
+        if (cos(mult * _x) * cos(mult * *temp_x) < 0)
+        {
+            lx = _x;
+            ly = _y;
+            lpx = _px;
+            lpy = _py;
+            lb = _b;
+            ldist = _dist;
+            _h = fabs (cos(mult * _x)) / fabs (cos(mult * *temp_x) - cos(mult * _x)) * (dist + *temp - _dist);        // step from _x to startx
+
+            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l, mult, *c, false);
+            _dist += _h;
+        }
+        else
+        {
+            *temp_x = _x;
+            *temp_y = _y;
+            *temp_px = _px;
+            *temp_py = _py;
+            *temp_b = _b;
+            *temp = _dist - dist;
+
+            _h = fabs (cos(mult * lx)) / fabs (cos(mult * lx) - cos(mult * _x)) * (_dist - ldist);        // step from lx to startx
+
+            _x    = lx;
+            _y    = ly;
+            _px   = lpx;
+            _py   = lpy;
+            _b    = lb;
+            _dist = ldist;
+
+            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l, mult, *c, false);
+            _dist += _h;
+        }
+    }
+
+    *temp_x  = x;
+    *temp_y  = y;
+    *temp_px = px;
+    *temp_py = py;
+    *temp_b  = b;
+    *temp    = _dist - dist;
+
+    RK (dist, temp_x, temp_y, temp_px, temp_py, temp_b, *temp, s, k, cab, f, g, u, v, l, mult, *c, false);        // counting startx point
 }
 
 // Adaptive Runge-Kutta
