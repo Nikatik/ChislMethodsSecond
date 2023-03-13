@@ -234,7 +234,7 @@ void diagonal(double dist,
     double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = dist;
     double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
                 
-    for (; fabs (cos(mult * _x)) > EPS * pow(10,3);)        // finding point of crossing
+    for (; fabs (cos(mult * _x)) > EPS * pow(10,4);)        // finding point of crossing
     {
         if (cos(mult * _x) * cos(mult * *temp_x) < 0)
         {
@@ -280,6 +280,7 @@ void diagonal(double dist,
     *temp    = _dist - dist;
 
     RK (dist, temp_x, temp_y, temp_px, temp_py, temp_b, *temp, s, k, cab, f, g, u, v, l, mult, *c, false);        // counting startx point
+    printf("Turning control point:\tt = %8.4f,\tX = %8.4f,\tY = %8.4f,\tPx = %8.4f,\tPy = %8.4f,\tB = %8.4f,\tDiscrepancy: %13e\n", dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, *temp_b, cos(mult * *temp_x));
 }
 
 // Adaptive Runge-Kutta
@@ -307,7 +308,8 @@ double astep (double T,
 			  double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
 			  double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
               double mult,
-              bool test)
+              bool test,
+              bool print)
 {
     double temp_x, temp_y, temp_px, temp_py, temp_b, x_, y_, px_, py_, b_, dist, h, temp, fac, err, norm;
     double (*c) (double, double, double, double, double, double);
@@ -360,7 +362,20 @@ double astep (double T,
             *j += 1;
             continue;
         }
+        
+        if(print && fabs(cos(mult * *x)) > EPS * pow(10,5) && cos(mult * *x) * cos(mult * temp_x) < EPS){
+            diagonal(dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, &temp, s, k, cab, f, g, u, v, l, mult, *c);
 
+            x_  = *x;
+            y_  = *y;
+            px_ = *px;
+            py_ = *py;
+            b_  = *b;
+            
+            RK (dist, &x_, &y_, &px_, &py_, &b_, temp, s, k, cab, f, g, u, v, l, mult, *c, true);
+            norm = sqrt(pow(temp_x - x_,2)+pow(temp_y - y_,2)+pow(temp_px - px_,2)+pow(temp_py - py_,2));
+        }
+        
         err += norm;
         dist += temp;
         *x  = temp_x;
@@ -396,12 +411,13 @@ double error(double T,
 	        double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
 	        double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
 	        double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-            double mult)
+            double mult,
+            bool print)
 {
 	long long unsigned i = 0;
 	long long unsigned j = 0;
 
-	if(astep(T, &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, f, g, u, v, l, mult, 0) + 1000000 < EPS)
+	if(astep(T, &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, f, g, u, v, l, mult, 0, print) + 1000000 < EPS)
         return -1000000;
 
 	err[0] = x;
@@ -474,7 +490,7 @@ int shooting_method(unsigned int max_iterations,
             {
                 //dy
                 
-                if(error(alpha[5], x, alpha_1+delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1+delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -485,7 +501,7 @@ int shooting_method(unsigned int max_iterations,
                 B[0] = err[0];  // y
                 B[3] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1-delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1-delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -496,7 +512,7 @@ int shooting_method(unsigned int max_iterations,
                 B[1] = err[0];  // y
                 B[4] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1+2*delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1+2*delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -507,7 +523,7 @@ int shooting_method(unsigned int max_iterations,
                 B[2] = err[0];  // y
                 B[5] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1-2*delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1-2*delta, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -520,7 +536,7 @@ int shooting_method(unsigned int max_iterations,
 
                 // dpx
                 
-                if(error(alpha[5], x, alpha_1, alpha_2+delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1, alpha_2+delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -531,7 +547,7 @@ int shooting_method(unsigned int max_iterations,
                 B[0] = err[0];  // y
                 B[3] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1, alpha_2-delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1, alpha_2-delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -542,7 +558,7 @@ int shooting_method(unsigned int max_iterations,
                 B[1] = err[0];  // y
                 B[4] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1, alpha_2+2.*delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1, alpha_2+2.*delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -553,7 +569,7 @@ int shooting_method(unsigned int max_iterations,
                 B[2] = err[0];  // y
                 B[5] = err[1];  // px
 
-                if(error(alpha[5], x, alpha_1, alpha_2-2.*delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1, alpha_2-2.*delta, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                         step_m *= 0.1;
                     if(fabs(alpha[5] - (alpha[1] + step_T)) < EPS)
@@ -565,7 +581,8 @@ int shooting_method(unsigned int max_iterations,
                 A[1][1] = (2.*B[3]-2.*B[4]-B[5]/4.+err[1]/4.)/(3*delta);
             }
             
-            integral = error(alpha[5], x, alpha_1, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]);
+            integral = 0;
+            integral = error(alpha[5], x, alpha_1, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0);
             if(integral + 1000000 < EPS){
                 if(fabs(alpha[4] - (alpha[0] + step_m)) < EPS)
                     step_m *= 0.1;
@@ -600,7 +617,7 @@ int shooting_method(unsigned int max_iterations,
             //demph
             
             for(betta = 1;;){
-                if(error(alpha[5], x, alpha_1 - betta * newton[0], alpha_2 + betta * newton[1], py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4]) + 1000000 < EPS){
+                if(error(alpha[5], x, alpha_1 - betta * newton[0], alpha_2 + betta * newton[1], py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 0) + 1000000 < EPS){
                     betta *= 1.01;
                     break;
                 }
@@ -617,7 +634,6 @@ int shooting_method(unsigned int max_iterations,
             
             alpha_1 -= betta * newton[0];
             alpha_2 += betta * newton[1];
-            integral = 0;
         }
         
         if(fabs(alpha[0] - alpha[4]) < EPS && fabs(alpha[1] - alpha[5]) < EPS )
@@ -638,6 +654,9 @@ int shooting_method(unsigned int max_iterations,
         
         
         if(fabs(alpha[0] - mult) < EPS && fabs(alpha[1] - T) < EPS) {
+            printf("\n---------------------\n");
+            integral = 0;
+            integral = error(alpha[5], x, alpha_1, alpha_2, py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[4], 1);
             printf("Shooting iteration: %u,\nAlpha: %.4f,\nDistance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\n\n", iteration, alpha[4], alpha[5], alpha_1, alpha_2, integral, sqrt(pow(B[0], 2) + pow(B[1], 2)));
             break;
         }
@@ -645,7 +664,7 @@ int shooting_method(unsigned int max_iterations,
         if((fabs(alpha[5] - alpha[1]) < pow(10, -4) && fabs(alpha[5] - alpha[1]) > EPS) || (fabs(alpha[4] - alpha[0]) < pow(10, -4) && fabs(alpha[4] - alpha[0]) > EPS)) {
                 printf("Newton's method does not converge!\n");
                 integral = 0;
-                integral = error(alpha[1], x, alpha[2], alpha[3], py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[0]);
+                integral = error(alpha[1], x, alpha[2], alpha[3], py, integral, err, p, s, k, cab, tol, f, g, u, v, l, alpha[0], 1);
                 printf("Shooting iteration: %u,\nAlpha: %16.4f,\nRequested alpha: %.4f,\nDistance: %16.4f,\nRequested distance: %.4f,\nY(0) = %.14f,\nPx(0) = %.14f,\nB = %.14f,\nDiscrepancy: %.3e\nSteps: %.4e   %.4e\n\n", iteration, alpha[0], mult, alpha[1], T, alpha[2], alpha[3], integral, sqrt(pow(err[0], 2) + pow(err[1], 2)), step_m, step_T);
     
                 free (A[0]);
@@ -757,7 +776,7 @@ int main()
     for(i=0; i < mult_c; i++){
         switch (i) {
             case 0:
-                mult[i] = 0.0;
+                mult[i] = 10.0;
                 break;
             default:
                 mult[i] = (i<=4)?pow(10,(double)i - 4.):5.*((double)i - 4.);
@@ -813,7 +832,7 @@ int main()
     ///////////////////////////////////////////////////////////////////////////////////////// 
     
     // the shooting method
-	astep(pi*pow(10,3), &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, test_x_d, test_y_d, test_px_d, test_py_d, test_B_d, 1, 1);
+	astep(pi*pow(10,3), &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, test_x_d, test_y_d, test_px_d, test_py_d, test_B_d, 1, 1, 0);
     printf("The Runge-Kutta test:\n%.2e    %.2e  |  %.2e    %.2e  |  %.7e  |  10^3*Pi\n\n", x - 1, y, px - 1, py, b);
     
     time (&start);
