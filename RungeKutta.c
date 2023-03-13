@@ -1,103 +1,78 @@
 #include "RungeKutta.h"
+
 #include "Control.h"
 
 // Runge-Kutta in general form (one step)
-void RK (double t,
-         double* x0,
-         double* y0,
-		 double* px0,
-         double* py0,
-         double* b0,
-         double h,
-         unsigned int s,
-         double** k,
-         double** cab,
-         double f (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-         double g (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-		 double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-         double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-         double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-         double mult,
-         double c (double, double, double, double, double, double),
+void RK (double t, double* x0, double* y0, double* px0, double* py0, double* b0,
+         double h, unsigned int s, double** k, double** cab,
+         double f (double, double, double, double, double, double,
+                   double (*) (double, double, double, double, double, double)),
+         double g (double, double, double, double, double, double,
+                   double (*) (double, double, double, double, double, double)),
+         double u (double, double, double, double, double, double,
+                   double (*) (double, double, double, double, double, double)),
+         double v (double, double, double, double, double, double,
+                   double (*) (double, double, double, double, double, double)),
+         double l (double, double, double, double, double, double,
+                   double (*) (double, double, double, double, double, double)),
+         double mult, double c (double, double, double, double, double, double),
          bool check)
 {
     double temp_x;
     double temp_y;
-	double temp_px;
+    double temp_px;
     double temp_py;
     double temp_b;
-    
+
 
     for (unsigned int i = 0; i < s; i++)
     {
-        temp_x = 0;
-        temp_y = 0;
+        temp_x  = 0;
+        temp_y  = 0;
         temp_px = 0;
         temp_py = 0;
-        temp_b = 0;
+        temp_b  = 0;
         for (unsigned int j = 0; j < i; j++)
         {
             temp_x += cab[i + 1][j] * k[0][j];
             temp_y += cab[i + 1][j] * k[1][j];
-			temp_px += cab[i + 1][j] * k[2][j];
-			temp_py += cab[i + 1][j] * k[3][j];
-			temp_b += cab[i + 1][j] * k[4][j];
+            temp_px += cab[i + 1][j] * k[2][j];
+            temp_py += cab[i + 1][j] * k[3][j];
+            temp_b += cab[i + 1][j] * k[4][j];
         }
         // printf("%f\n",f(1,0));
-        k[0][i] = f (t + h * cab[0][i],
-					*x0 + h * temp_x,
-					*y0 + h * temp_y,
-					*px0 + h * temp_px,
-					*py0 + h * temp_py,
-                    mult, c);
-					
-        k[1][i] = g (t + h * cab[0][i],
-					*x0 + h * temp_x,
-					*y0 + h * temp_y,
-					*px0 + h * temp_px,
-					*py0 + h * temp_py,
-                    mult, c);
-					
-		k[2][i] = u (t + h * cab[0][i],
-					*x0 + h * temp_x,
-					*y0 + h * temp_y,
-					*px0 + h * temp_px,
-					*py0 + h * temp_py,
-                    mult, c);
-					
-		k[3][i] = v (t + h * cab[0][i],
-					*x0 + h * temp_x,
-					*y0 + h * temp_y,
-					*px0 + h * temp_px,
-					*py0 + h * temp_py,
-                    mult, c);
-        
-        k[4][i] = l (t + h * cab[0][i],
-					*x0 + h * temp_x,
-					*y0 + h * temp_y,
-					*px0 + h * temp_px,
-					*py0 + h * temp_py,
-                    mult, c);
-        
-        
+        k[0][i] = f (t + h * cab[0][i], *x0 + h * temp_x, *y0 + h * temp_y,
+                     *px0 + h * temp_px, *py0 + h * temp_py, mult, c);
+
+        k[1][i] = g (t + h * cab[0][i], *x0 + h * temp_x, *y0 + h * temp_y,
+                     *px0 + h * temp_px, *py0 + h * temp_py, mult, c);
+
+        k[2][i] = u (t + h * cab[0][i], *x0 + h * temp_x, *y0 + h * temp_y,
+                     *px0 + h * temp_px, *py0 + h * temp_py, mult, c);
+
+        k[3][i] = v (t + h * cab[0][i], *x0 + h * temp_x, *y0 + h * temp_y,
+                     *px0 + h * temp_px, *py0 + h * temp_py, mult, c);
+
+        k[4][i] = l (t + h * cab[0][i], *x0 + h * temp_x, *y0 + h * temp_y,
+                     *px0 + h * temp_px, *py0 + h * temp_py, mult, c);
     }
 
-    temp_x = 0;
-    temp_y = 0;
-	temp_px = 0;
+    temp_x  = 0;
+    temp_y  = 0;
+    temp_px = 0;
     temp_py = 0;
-    temp_b = 0;
-    
-	
+    temp_b  = 0;
+
+
     if (check)
     {
         for (unsigned int i = 0; i < s; i++)
         {
             temp_x += cab[s + 2][i] * k[0][i];
             temp_y += cab[s + 2][i] * k[1][i];
-			temp_px += cab[s + 2][i] * k[2][i];
-			temp_py += cab[s + 2][i] * k[3][i];
-			temp_b += cab[s + 2][i] * k[4][i];
+            temp_px += cab[s + 2][i] * k[2][i];
+            temp_py += cab[s + 2][i] * k[3][i];
+            temp_b += cab[s + 2][i] * k[4][i];
         }
     }
     else
@@ -106,72 +81,71 @@ void RK (double t,
         {
             temp_x += cab[s + 1][i] * k[0][i];
             temp_y += cab[s + 1][i] * k[1][i];
-			temp_px += cab[s + 1][i] * k[2][i];
-			temp_py += cab[s + 1][i] * k[3][i];
-			temp_b += cab[s + 1][i] * k[4][i];           
+            temp_px += cab[s + 1][i] * k[2][i];
+            temp_py += cab[s + 1][i] * k[3][i];
+            temp_b += cab[s + 1][i] * k[4][i];
         }
     }
 
     *x0 += h * temp_x;
     *y0 += h * temp_y;
-	*px0 += h * temp_px;
-    *py0 += h * temp_py;      
-    *b0 += h * temp_b;       
+    *px0 += h * temp_px;
+    *py0 += h * temp_py;
+    *b0 += h * temp_b;
 }
-    
+
 // Finding crossing point
-void diagonal(double dist, 
-              double x, 
-              double y, 
-              double px, 
-              double py, 
-              double b, 
-              double* temp_x, 
-              double* temp_y, 
-              double* temp_px, 
-              double* temp_py, 
-              double* temp_b, 
-              double* temp, 
-              unsigned int s,
-              double** k,
-              double** cab,
-              double tol,
-              double f (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double g (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double mult,
-              double c (double, double, double, double, double, double))
-{    
+void diagonal (
+    double dist, double x, double y, double px, double py, double b,
+    double* temp_x, double* temp_y, double* temp_px, double* temp_py,
+    double* temp_b, double* temp, unsigned int s, double** k, double** cab,
+    double tol,
+    double f (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double g (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double u (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double v (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double l (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double mult, double c (double, double, double, double, double, double))
+{
     double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = dist;
     double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
-                
-    for (; fabs (cos(mult * _x)) > tol * pow(10, 3);)        // finding point of crossing
-    {
-        if (cos(mult * _x) * cos(mult * *temp_x) < 0)
-        {
-            lx = _x;
-            ly = _y;
-            lpx = _px;
-            lpy = _py;
-            lb = _b;
-            ldist = _dist;
-            _h = fabs (cos(mult * _x)) / fabs (cos(mult * *temp_x) - cos(mult * _x)) * (dist + *temp - _dist);        // step from _x to startx
 
-            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l, mult, *c, false);
+    for (; fabs (cos (mult * _x)) >
+           tol * pow (10, 3);)        // finding point of crossing
+    {
+        if (cos (mult * _x) * cos (mult * *temp_x) < 0)
+        {
+            lx    = _x;
+            ly    = _y;
+            lpx   = _px;
+            lpy   = _py;
+            lb    = _b;
+            ldist = _dist;
+            _h    = fabs (cos (mult * _x)) /
+                 fabs (cos (mult * *temp_x) - cos (mult * _x)) *
+                 (dist + *temp - _dist);        // step from _x to startx
+
+            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l,
+                mult, *c, false);
             _dist += _h;
         }
         else
         {
-            *temp_x = _x;
-            *temp_y = _y;
+            *temp_x  = _x;
+            *temp_y  = _y;
             *temp_px = _px;
             *temp_py = _py;
-            *temp_b = _b;
-            *temp = _dist - dist;
+            *temp_b  = _b;
+            *temp    = _dist - dist;
 
-            _h = fabs (cos(mult * lx)) / fabs (cos(mult * lx) - cos(mult * _x)) * (_dist - ldist);        // step from lx to startx
+            _h = fabs (cos (mult * lx)) /
+                 fabs (cos (mult * lx) - cos (mult * _x)) *
+                 (_dist - ldist);        // step from lx to startx
 
             _x    = lx;
             _y    = ly;
@@ -180,7 +154,8 @@ void diagonal(double dist,
             _b    = lb;
             _dist = ldist;
 
-            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l, mult, *c, false);
+            RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l,
+                mult, *c, false);
             _dist += _h;
         }
     }
@@ -192,72 +167,74 @@ void diagonal(double dist,
     *temp_b  = b;
     *temp    = _dist - dist;
 
-    RK (dist, temp_x, temp_y, temp_px, temp_py, temp_b, *temp, s, k, cab, f, g, u, v, l, mult, *c, false);        // counting startx point
-    printf("Turning control point:\tt = %8.4f,\tX = %8.4f,\tY = %8.4f,\tPx = %8.4f,\tPy = %8.4f,\tB = %8.4f,\tDiscrepancy: %13e\n", dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, *temp_b, cos(mult * *temp_x));
+    RK (dist, temp_x, temp_y, temp_px, temp_py, temp_b, *temp, s, k, cab, f, g,
+        u, v, l, mult, *c, false);        // counting startx point
+    printf (
+        "Turning control point:\tt = %8.4f,\tX = %8.4f,\tY = %8.4f,\tPx = %8.4f,\tPy = %8.4f,\tB = %8.4f,\tDiscrepancy: %13e\n",
+        dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, *temp_b,
+        cos (mult * *temp_x));
 }
 
 // Adaptive Runge-Kutta
-double astep (double T,
-              double* x,
-              double* y,
-			  double* px,
-			  double* py,
-			  double* b,
-			  
-              long long unsigned* i,
-              long long unsigned* j,
-			  
-              unsigned int p,
-              unsigned int s,
-			  
-              double** k,
-              double** cab,
-			  
-              double tol,
-			  
-              double f (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-			  double g (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-			  double u (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-			  double v (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-			  double l (double, double, double, double, double, double, double (*)(double,  double,  double,  double,  double,  double)),
-              double mult,
-              bool test,
-              bool print)
+double astep (
+    double T, double* x, double* y, double* px, double* py, double* b,
+
+    long long unsigned* i, long long unsigned* j,
+
+    unsigned int p, unsigned int s,
+
+    double** k, double** cab,
+
+    double tol,
+
+    double f (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double g (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double u (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double v (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double l (double, double, double, double, double, double,
+              double (*) (double, double, double, double, double, double)),
+    double mult, bool test, bool print)
 {
-    double temp_x, temp_y, temp_px, temp_py, temp_b, x_, y_, px_, py_, b_, dist, h, temp, fac, err, norm;
+    double temp_x, temp_y, temp_px, temp_py, temp_b, x_, y_, px_, py_, b_, dist,
+        h, temp, fac, err, norm;
     double (*c) (double, double, double, double, double, double);
     x_ = temp_x = *x;
     y_ = temp_y = *y;
-    
-	px_ = temp_px = *px;
+
+    px_ = temp_px = *px;
     py_ = temp_py = *py;
     b_ = temp_b = *b;
-    
-    
-    dist        = 0;
-    h           = 0.01;
-    fac         = 1.7;
-    err         = 0;
-    norm        = 0;
-	c = (test)?0:contol_n;
+
+
+    dist = 0;
+    h    = 0.01;
+    fac  = 1.7;
+    err  = 0;
+    norm = 0;
+    c    = (test) ? 0 : contol_n;
     // printf("%.2e    %.6e  |  %.6e    %.2e\n", *x, *y, *px, *py);
-	
+
     for (*i = *j = 0; T - dist > EPS;)
-    {   
-        
+    {
+
         if (dist + h > T) h = T - dist;
 
-        RK (dist, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, h, s, k, cab, f, g, u, v, l, mult, *c, false);
-        RK (dist, &x_, &y_, &px_, &py_, &b_, h, s, k, cab, f, g, u, v, l, mult, *c, true);
-        
-        
-        // norm = fmax( fmax( fabs (temp_x - x_), fabs (temp_y - y_)), fmax(fabs (temp_px - px_), fabs (temp_py - py_)));
-        norm = sqrt(pow(temp_x - x_,2)+pow(temp_y - y_,2)+pow(temp_px - px_,2)+pow(temp_py - py_,2));
+        RK (dist, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, h, s, k, cab,
+            f, g, u, v, l, mult, *c, false);
+        RK (dist, &x_, &y_, &px_, &py_, &b_, h, s, k, cab, f, g, u, v, l, mult,
+            *c, true);
+
+
+        // norm = fmax( fmax( fabs (temp_x - x_), fabs (temp_y - y_)), fmax(fabs
+        // (temp_px - px_), fabs (temp_py - py_)));
+        norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
+                     pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
         temp = h;
-        h *= fmin (fac,
-                   fmax (0.7,
-                         pow (0.98 * tol / norm,
-                              1. / (p + 1))));
+        h *= fmin (fac, fmax (0.7, pow (0.98 * tol / norm, 1. / (p + 1))));
         if (h < pow (10, -18))
         {
             // printf ("\nSomething goes wrong...\n");
@@ -270,35 +247,41 @@ double astep (double T,
 
             px_ = temp_px = *px;
             py_ = temp_py = *py;
-			b_ = temp_b = *b;
+            b_ = temp_b = *b;
             fac         = 1;
             *j += 1;
             continue;
         }
-        
-        if(print && fabs(cos(mult * *x)) > tol * pow(10, 4) && cos(mult * *x) * cos(mult * temp_x) < EPS){
-            diagonal(dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px, &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l, mult, *c);
+
+        if (print && fabs (cos (mult * *x)) > tol * pow (10, 4) &&
+            cos (mult * *x) * cos (mult * temp_x) < EPS)
+        {
+            diagonal (dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px,
+                      &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l,
+                      mult, *c);
 
             x_  = *x;
             y_  = *y;
             px_ = *px;
             py_ = *py;
             b_  = *b;
-            
-            RK (dist, &x_, &y_, &px_, &py_, &b_, temp, s, k, cab, f, g, u, v, l, mult, *c, true);
-            norm = sqrt(pow(temp_x - x_,2)+pow(temp_y - y_,2)+pow(temp_px - px_,2)+pow(temp_py - py_,2));
+
+            RK (dist, &x_, &y_, &px_, &py_, &b_, temp, s, k, cab, f, g, u, v, l,
+                mult, *c, true);
+            norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
+                         pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
         }
-        
+
         err += norm;
         dist += temp;
         *x  = temp_x;
         *y  = temp_y;
-		*px = temp_px;
-		*py = temp_py;
-		*b = temp_b;
+        *px = temp_px;
+        *py = temp_py;
+        *b  = temp_b;
         fac = 1.7;
         *i += 1;
     }
-    //printf("%.2e    %.2e  |  %.2e    %.2e\n", *x, *y, *px, *py);
+    // printf("%.2e    %.2e  |  %.2e    %.2e\n", *x, *y, *px, *py);
     return err;
 }

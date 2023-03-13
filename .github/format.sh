@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 for val in $(ls | grep "\.[ch]p*")
 do
-./.github/clang-format.sh ./"$val" > ./h_"$val" && mv ./h_"$val" ./"$val"
+clang-format --style=file:./.github/.clang-format ./"$val" > ./h_"$val" && mv ./h_"$val" ./"$val"
 done
 
