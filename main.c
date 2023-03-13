@@ -5,169 +5,74 @@
 #include "Newton.h"
 #include "RungeKutta.h"
 
-    
-double rd (FILE* inpf)        // reading floating point number from a/b format
-{
-    int chisl = 0;
-    int znam  = 1;
-    char tmp;
-    _Pragma ("GCC diagnostic push");
-    _Pragma ("GCC diagnostic ignored \"-Wunused-result\"");
-    fscanf (inpf, "%d", &chisl);
-    if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
-    _Pragma ("GCC diagnostic pop");
-    return ((double)chisl) / znam;
-}
+int open (FILE**, char*, unsigned int*, unsigned int*);
+void initialization (long long unsigned, long long unsigned, unsigned int, unsigned int, unsigned int, double***, double***, double**, double**, double**);
+void reading (FILE*, double**, unsigned int, long long unsigned, long long unsigned);
+double rd (FILE*);
+void printing (double**, unsigned int, long long unsigned, long long unsigned);
+void cleaning (long long unsigned, unsigned int, FILE*, double**, double**, double*, double*, double*);
 
 int main()
 {
-    double tol           = pow (10, -17);
-    long long unsigned i = 0;
-    long long unsigned j = 0;
+    double tol = pow (10, -17);
 
-    double x=1;
-	double y=0;
-	double px=1;
-	double py=0;
-    double b=0;
+    double x  = 1;
+	double y  = 0;
+	double px = 1;
+	double py = 0;
+    double b  = 0;
+    
+    FILE* inpf;
 	
-    double*     T; // T из условия
+    double*      T;
     unsigned int T_c = 3;
-    double*  mult; // alpha из условия
+    
+    double*      mult;
     unsigned int mult_c = 1;
-    double* alpha; // под невязки
+    
+    double* alpha;
 
     unsigned int s;
     unsigned int p;
+    
     double** k;
     double** cab;
-
+    
     clock_t timer;
-
-    /////////////////////////////////////////////////////////////////////////////////////////
-
-    // file check
-
-
-    FILE* inpf = fopen ("koef (8).txt", "r");
-    if (inpf == NULL)
-    {
-        printf ("File doen`t exist\n");
-        return -1;
-    }
-    if (!fscanf (inpf, "%ud", &p) || !fscanf (inpf, "%ud", &s))
-    {
-        printf ("File isn`t correct\n");
-        fclose (inpf);
-        return -2;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////
-
-    // CAB matrix initialization
-
-    cab = (double**)malloc ((s + 3) * sizeof (double*));
-    for (i = 0; i < s + 3; i++)
-    {
-        cab[i] = (double*)malloc (s * sizeof (double));
-        for (j = 0; j < s; j++)
-        {
-            cab[i][j] = 0;
-        }
-    }
     
-    T = (double*)malloc (T_c * sizeof (double));
-    for(i=0; i < T_c; i++){
-        switch (i) {
-            case 0:
-                T[i] = 1;
-                break;
-            case 1:
-                T[i] = 2;
-                break;
-            case 2:
-                T[i] = 3;
-                break;
-            case 3:
-                T[i] = 3.5;
-                break;
-            case 4:
-                T[i] = 10;
-                break;
-            case 5:
-                T[i] = 0.1;
-                break;
-            case 7:
-                T[i] = 0.1;
-                break;
-            default:
-                T[i] = 1;
-        }
-    }
-    
-    mult = (double*)malloc (mult_c * sizeof (double));
-    for(i=0; i < mult_c; i++){
-        switch (i) {
-            case 0:
-                mult[i] = 0.0;
-                break;
-            default:
-                mult[i] = (i<=4)?pow(10,(double)i - 4.):5.*((double)i - 4.);
-        }
-    }
+    long long unsigned i = 0;
+    long long unsigned j = 0;
 
-	alpha = (double*)malloc (6 * sizeof (double));
-    alpha[0] = mult[0];
-    alpha[1] = T[0];
-    alpha[2] = 5.;
-    alpha[3] = -12.;
+    /////////////////////////////////////////////////////////////////////////////////////////
 
-    k    = (double**)malloc (5 * sizeof (double*));
-    k[0] = (double*)malloc (s * sizeof (double));
-    k[1] = (double*)malloc (s * sizeof (double));
-	k[2] = (double*)malloc (s * sizeof (double));
-    k[3] = (double*)malloc (s * sizeof (double));
-    k[4] = (double*)malloc (s * sizeof (double));
-	
-    for (i = 0; i < s; i++)
+    switch (open(&inpf, "koef (8).txt", &s, &p)) 
     {
-        k[0][i] = 0;
-        k[1][i] = 0;
-		k[2][i] = 0;
-        k[3][i] = 0;
-        k[4][i] = 0;
+        case -1:
+            return -1;
+        case -2:
+            return -2;
+        default:;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    // CAB matrix reading
+    initialization (i, j, s, T_c, mult_c, &cab, &k, &T, &mult, &alpha);
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
 
-    for (i = 0; i < s; i++)
-    {
-        cab[0][i] = rd (inpf);
-    }
+    reading(inpf, cab, s, i, j);
 
-    for (i = 2; i < s + 3; i++)
-        for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)
-            cab[i][j] = rd (inpf);
-
-    // CAB matrix printing
-    /*
-            printf ("\n");
-            for (unsigned int i = 0; i < s + 3; i++)
-            {
-                for (unsigned int j = 0; j < s; j++)
-                    printf ("%6.3f ", cab[i][j]);
-                printf ("\n");
-            }
-            printf ("\n");
-        */
+    // printing (cab, s, i, j);
+    
     ///////////////////////////////////////////////////////////////////////////////////////// 
     
-    // the shooting method
+    // Testing ARK
 	astep(pi*pow(10,3), &x, &y, &px, &py, &b, &i, &j, p, s, k, cab, tol, test_x_d, test_y_d, test_px_d, test_py_d, test_B_d, 1, 1, 0);
     printf("The Runge-Kutta test:\n%.2e    %.2e  |  %.2e    %.2e  |  %.7e  |  10^3*Pi\n\n", x - 1, y, px - 1, py, b);
     
+    ///////////////////////////////////////////////////////////////////////////////////////// 
+    
+    // The shoting method
     timer = clock();
     
 	x=0;
@@ -183,28 +88,165 @@ int main()
             if(shooting_method(500, T[m], x, py, alpha, p, s, k, cab, tol, x_d, y_d, px_d, py_d, B_d, mult[l]) == -1)
                 break;
         }
+    
+    timer -= clock();
+    printf ("%.5f seconds\n", ((double)-timer)/CLOCKS_PER_SEC);
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    // cleaning :)
+    cleaning(i, s, inpf, cab, k, T, mult, alpha);
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
 
-    fclose (inpf);
+    return 0;
+}
+
+// File checker
+int open (FILE** inpf, char* path, unsigned int* s, unsigned int* p)
+{
+    
+    *inpf = fopen (path, "r");
+    if (*inpf == NULL)
+    {
+        printf ("File doen`t exist\n");
+        return -1;
+    }
+    if (!fscanf (*inpf, "%ud", p) || !fscanf (*inpf, "%ud", s))
+    {
+        printf ("File isn`t correct\n");
+        fclose (*inpf);
+        return -2;
+    }
+    return 0;
+}
+
+// Constructor
+void initialization (long long unsigned i, long long unsigned j, unsigned int s, unsigned int T_c, unsigned int mult_c, double*** cab, double*** k, double** T, double** mult, double** alpha)
+{
+    *cab = (double**)malloc ((s + 3) * sizeof (double*));
     for (i = 0; i < s + 3; i++)
     {
-        free (cab[i]);
+        (*cab)[i] = (double*)malloc (s * sizeof (double));
+        for (j = 0; j < s; j++)
+        {
+            (*cab)[i][j] = 0;
+        }
     }
+    
+    
+    *k = (double**)malloc (5 * sizeof (double*));
+    for (i = 0; i < 5; i++)
+    {
+        (*k)[i] = (double*)malloc (s * sizeof (double));
+        for (j = 0; j < s; j++)
+        {
+            (*k)[i][j] = 0;
+        }
+    }
+    
+    //values for T from book
+    *T = (double*)malloc (T_c * sizeof (double));
+    for(i=0; i < T_c; i++){
+        switch (i) {
+            case 0:
+                (*T)[i] = 1;
+                break;
+            case 1:
+                (*T)[i] = 2;
+                break;
+            case 2:
+                (*T)[i] = 3;
+                break;
+            case 3:
+                (*T)[i] = 3.5;
+                break;
+            case 4:
+                (*T)[i] = 10;
+                break;
+            case 5:
+                (*T)[i] = 0.1;
+                break;
+            case 7:
+                (*T)[i] = 0.1;
+                break;
+            default:
+                (*T)[i] = 1;
+        }
+    }
+    
+    //values for Alpha from book
+    *mult = (double*)malloc (mult_c * sizeof (double));
+    for(i=0; i < mult_c; i++){
+        switch (i) {
+            case 0:
+                (*mult)[i] = 0.0;
+                break;
+            default:
+                (*mult)[i] = (i<=4)?pow(10,(double)i - 4.):5.*((double)i - 4.);
+        }
+    }
+
+	*alpha = (double*)malloc (6 * sizeof (double));
+    (*alpha)[0] = (*mult)[0];
+    (*alpha)[1] = (*T)[0];
+    (*alpha)[2] = -0.5; //start value for shoting method
+    (*alpha)[3] = -2.;  //start value for shoting method
+}
+
+// CAB matrix reading
+void reading (FILE* inpf, double** cab, unsigned int s, long long unsigned i, long long unsigned j)
+{
+    for (i = 0; i < s; i++)
+    {
+        cab[0][i] = rd (inpf);
+    }
+
+    for (i = 2; i < s + 3; i++)
+        for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)
+            cab[i][j] = rd (inpf);
+}
+
+// Reading floating point number from a/b format
+double rd (FILE* inpf)        
+{
+    int chisl = 0;
+    int znam  = 1;
+    char tmp;
+    _Pragma ("GCC diagnostic push");
+    _Pragma ("GCC diagnostic ignored \"-Wunused-result\"");
+    fscanf (inpf, "%d", &chisl);
+    if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
+    _Pragma ("GCC diagnostic pop");
+    return ((double)chisl) / znam;
+}
+
+// CAB matrix printing
+void printing (double** cab, unsigned int s, long long unsigned i, long long unsigned j)
+{
+    printf ("\n");
+    for (i = 0; i < s + 3; i++)
+    {
+        for (j = 0; j < s; j++)
+            printf ("%6.3f ", cab[i][j]);
+        printf ("\n");
+    }
+    printf ("\n");
+}
+
+// Deconstructor
+void cleaning (long long unsigned i, unsigned int s, FILE* inpf, double** cab, double** k, double* T, double* mult, double* alpha)
+{
+    fclose (inpf);
+    
+    for (i = 0; i < s + 3; i++)
+        free (cab[i]);
     free (cab);
+    
+    for (i = 0; i < 5; i++)
+        free (k[i]);
+    free (k);
+    
 	free (T);
 	free (mult);
 	free (alpha);
-    free (k[0]);
-    free (k[1]);
-	free (k[2]);
-    free (k[3]);
-    free (k[4]);
-    free (k);
-
-    timer -= clock();
-    printf ("%.5f seconds\n", ((double)-timer)/CLOCKS_PER_SEC);
-    return 0;
 }
