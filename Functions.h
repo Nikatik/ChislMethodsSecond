@@ -15,14 +15,15 @@ static double
     y_d (double t, double x, double y, double p_x, double p_y, double mult,
          double control (double, double, double, double, double, double))
 {
-    return control(t, x, y, p_x, p_y, mult);
+    return control (t, x, y, p_x, p_y, mult);
 }
 
 static double
     px_d (double t, double x, double y, double p_x, double p_y, double mult,
           double control (double, double, double, double, double, double))
 {
-    return (-mult/2.)*sin(mult*x)*pow(control(t, x, y, p_x, p_y, mult),2);
+    return (-mult / 2.) * sin (mult * x) *
+           pow (control (t, x, y, p_x, p_y, mult), 2);
 }
 
 static double

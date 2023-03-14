@@ -180,8 +180,8 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
     *alpha      = (double*) malloc (6 * sizeof (double));
     (*alpha)[0] = (*mult)[0];
     (*alpha)[1] = (*T)[0];
-    (*alpha)[2] = -0.5;        // start value for shoting method
-    (*alpha)[3] = -2.;         // start value for shoting method
+    (*alpha)[2] = -9.79;        // start value for shoting method
+    (*alpha)[3] = 3.87;         // start value for shoting method
 }
 
 // CAB matrix reading

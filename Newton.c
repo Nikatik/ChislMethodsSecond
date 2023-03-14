@@ -94,7 +94,7 @@ int shooting_method (
         integral = 0;
         alpha_1  = alpha[2];        // y
         alpha_2 =
-            alpha[3];        // px
+            alpha[3];               // px
                              //  printf("mult_0=%13.7e  |  mult_k=%13.7e  |
                              //  mult=%13.7e  |  T_0=%13.7e  |  T_k=%13.7e  |
                              //  T=%13.7e  |  step_m=%13.7e  |
