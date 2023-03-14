@@ -215,7 +215,7 @@ double astep (
     fac  = 1.7;
     err  = 0;
     norm = 0;
-    c    = (test) ? 0 : contol_n;
+    c    = (test) ? 0 : control_n;
     // printf("%.2e    %.6e  |  %.6e    %.2e\n", *x, *y, *px, *py);
 
     for (*i = *j = 0; T - dist > EPS;)
@@ -270,7 +270,10 @@ double astep (
                 mult, *c, true);
             norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
                          pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
+            c = (temp_px > 0)?control_m:control_p;
         }
+        if (fabs(cos(mult * *x)) < tol * pow(10, 4) && fabs(cos(mult * temp_x)) > tol * pow(10, 4))
+            c = (cos(mult * temp_x) > 0)?control_n:(temp_px > 0)?control_m:control_p;
 
         err += norm;
         dist += temp;
