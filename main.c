@@ -29,10 +29,10 @@ int main()
     FILE* inpf;
 
     double*      T;
-    unsigned int T_c = 3;
+    unsigned int T_c = 1;
 
     double*      mult;
-    unsigned int mult_c = 1;
+    unsigned int mult_c = 5;
 
     double* alpha;
 
@@ -80,7 +80,7 @@ int main()
     // The shoting method
     timer = clock();
 
-    x  = 0;
+    x  = 11;
     y  = 0;
     px = 0;
     py = 0;
@@ -91,7 +91,7 @@ int main()
             alpha[4] = mult[l];
             alpha[5] = T[m];
 
-            if (shooting_method (500, T[m], x, py, alpha, p, s, k, cab, tol,
+            if (shooting_method (1500, T[m], x, py, alpha, p, s, k, cab, tol,
                                  x_d, y_d, px_d, py_d, B_d, mult[l]) == -1)
                 break;
         }
@@ -153,7 +153,7 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
     {
         switch (i)
         {
-            case 0: (*T)[i] = 1; break;
+            case 0: (*T)[i] = 4; break;
             case 1: (*T)[i] = 2; break;
             case 2: (*T)[i] = 3; break;
             case 3: (*T)[i] = 3.5; break;

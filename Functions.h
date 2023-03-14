@@ -6,28 +6,28 @@
 
 static double
     x_d (double t, double x, double y, double p_x, double p_y, double mult,
-         double contol (double, double, double, double, double, double))
+         double control (double, double, double, double, double, double))
 {
     return y;
 }
 
 static double
     y_d (double t, double x, double y, double p_x, double p_y, double mult,
-         double contol (double, double, double, double, double, double))
+         double control (double, double, double, double, double, double))
 {
-    return p_y;
+    return control(t, x, y, p_x, p_y, mult);
 }
 
 static double
     px_d (double t, double x, double y, double p_x, double p_y, double mult,
-          double contol (double, double, double, double, double, double))
+          double control (double, double, double, double, double, double))
 {
-    return -x;
+    return (-mult/2.)*sin(mult*x)*pow(control(t, x, y, p_x, p_y, mult),2);
 }
 
 static double
     py_d (double t, double x, double y, double p_x, double p_y, double mult,
-          double contol (double, double, double, double, double, double))
+          double control (double, double, double, double, double, double))
 {
     return -p_x - y;
 }

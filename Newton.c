@@ -33,7 +33,7 @@ double error (
         return -1000000;
 
     err[0] = x;
-    err[1] = y - 1;
+    err[1] = y;
 
     return b;
 }

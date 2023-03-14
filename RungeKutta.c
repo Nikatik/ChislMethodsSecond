@@ -223,7 +223,7 @@ double astep (
     fac  = 1.7;
     err  = 0;
     norm = 0;
-    c    = (test) ? 0 : control_n;
+    c    = (test) ? 0 : (cos(mult * *x) > 0)?control_n:(*py>0)?control_p:control_m;
     // printf("%.2e    %.6e  |  %.6e    %.2e\n", *x, *y, *px, *py);
 
     for (*i = *j = 0; T - dist > EPS;)
