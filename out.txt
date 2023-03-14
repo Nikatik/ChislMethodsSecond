@@ -1,0 +1,52 @@
+The Runge-Kutta test:
+-5.23e-13    -5.25e-13  |  -5.23e-13    -5.25e-13  |  0.0000000e+00  |  10^3*Pi
+
+
+-----------------------
+Turning control point:	t =   3.1416,	X =  -1.1588,	Y =   2.0508,	Px =   3.8703,	Py =   0.0000,	B =  67.0662,	Discrepancy:  1.360023e-15
+Shooting iteration: 418,
+Alpha: 0.0000,
+Distance: 4.0000,
+Y(0) = -9.79134142702180,
+Px(0) = 3.87027034284934,
+B = 68.92903062695670,
+Discrepancy: 8.513e-15
+
+
+-----------------------
+Turning control point:	t =   3.1416,	X =  -1.1589,	Y =   2.0509,	Px =   3.8703,	Py =  -0.0000,	B =  67.0664,	Discrepancy: -1.124101e-15
+Shooting iteration: 281,
+Alpha: 0.0010,
+Distance: 4.0000,
+Y(0) = -9.79145876325196,
+Px(0) = 3.87029979258469,
+B = 68.92932495041879,
+Discrepancy: 5.944e-15
+
+
+-----------------------
+Turning control point:	t =   3.1410,	X =  -1.1629,	Y =   2.0566,	Px =   3.8735,	Py =   0.0000,	B =  67.0862,	Discrepancy:  6.383782e-16
+Shooting iteration: 331,
+Alpha: 0.0100,
+Distance: 4.0000,
+Y(0) = -9.80315488873587,
+Px(0) = 3.87322698052975,
+B = 68.95900328493228,
+Discrepancy: 6.449e-15
+
+
+-----------------------------------
+Newton's method does not converge!
+Turning control point:	t =   3.0730,	X =  -1.7726,	Y =   2.9125,	Px =   4.3673,	Py =  -0.0000,	B =  74.8030,	Discrepancy: -7.910339e-16
+Shooting iteration: 1501,
+Alpha:           0.0712,
+Requested alpha: 0.1000,
+Distance:           4.0000,
+Requested distance: 4.0000,
+Y(0) = -11.25713219171385,
+Px(0) = 4.12187823874943,
+B = 78.44227251397847,
+Discrepancy: 5.545e-15
+Steps: 1.7716e-05   0.0000e+00
+
+34.93861 seconds
