@@ -270,10 +270,10 @@ double astep (
                 mult, *c, true);
             norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
                          pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
-            c = (temp_px > 0)?control_m:control_p;
+            c = (temp_py > 0)?control_p:control_m;
         }
         if (fabs(cos(mult * *x)) < tol * pow(10, 4) && fabs(cos(mult * temp_x)) > tol * pow(10, 4))
-            c = (cos(mult * temp_x) > 0)?control_n:(temp_px > 0)?control_m:control_p;
+            c = (cos(mult * temp_x) > 0)?control_n:(temp_py > 0)?control_p:control_m;
 
         err += norm;
         dist += temp;

@@ -23,4 +23,10 @@ double mult)
     return -24;
 }
 
+/*
+static double hamelt (double t, double x, double y, double p_x, double p_y, double mult, double c)
+{
+    return -cos(mult * x) * pow(c, 2.) / 2. + p_y * c;
+}
+*/
 #pragma GCC diagnostic pop
