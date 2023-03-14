@@ -12,8 +12,8 @@ void   initialization (long long unsigned, long long unsigned, unsigned int,
 void   reading (FILE*, double**, unsigned int, long long unsigned,
                 long long unsigned);
 double rd (FILE*);
-void   printing (double**, unsigned int, long long unsigned, long long unsigned);
-void   cleaning (long long unsigned, unsigned int, FILE*, double**, double**,
+void printing (double**, unsigned int, long long unsigned, long long unsigned);
+void cleaning (long long unsigned, unsigned int, FILE*, double**, double**,
                double*, double*, double*);
 
 int main()
@@ -136,7 +136,7 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
     for (i = 0; i < s + 3; i++)
     {
         (*cab)[i] = (double*) malloc (s * sizeof (double));
-        for (j = 0; j < s; j++) { (*cab)[i][j] = 0; }
+        for (j = 0; j < s; j++) (*cab)[i][j] = 0;
     }
 
 
@@ -144,7 +144,7 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
     for (i = 0; i < 5; i++)
     {
         (*k)[i] = (double*) malloc (s * sizeof (double));
-        for (j = 0; j < s; j++) { (*k)[i][j] = 0; }
+        for (j = 0; j < s; j++) (*k)[i][j] = 0;
     }
 
     // values for T from book
@@ -188,7 +188,7 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
 void reading (FILE* inpf, double** cab, unsigned int s, long long unsigned i,
               long long unsigned j)
 {
-    for (i = 0; i < s; i++) { cab[0][i] = rd (inpf); }
+    for (i = 0; i < s; i++) cab[0][i] = rd (inpf);
 
     for (i = 2; i < s + 3; i++)
         for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)

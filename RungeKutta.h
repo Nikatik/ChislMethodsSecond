@@ -30,7 +30,8 @@ void diagonal (
                 double (*) (double, double, double, double, double, double)),
     double (*) (double, double, double, double, double, double,
                 double (*) (double, double, double, double, double, double)),
-    double, double (*) (double, double, double, double, double, double));
+    double, double (*) (double, double, double, double, double, double),
+    double (*) (double, double, double, double, double, double), bool);
 
 // Adaptive Runge-Kutta
 double astep (

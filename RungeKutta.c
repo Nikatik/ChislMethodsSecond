@@ -110,15 +110,19 @@ void diagonal (
               double (*) (double, double, double, double, double, double)),
     double l (double, double, double, double, double, double,
               double (*) (double, double, double, double, double, double)),
-    double mult, double c (double, double, double, double, double, double))
+    double mult, double c (double, double, double, double, double, double),
+    double func (double, double, double, double, double, double), bool print)
 {
     double lx = x, ly = y, lpx = px, lpy = py, lb = b, ldist = dist;
     double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
 
-    for (; fabs (cos (mult * _x)) >
-           tol * pow (10, 3);)        // finding point of crossing
+    for (; fabs (func (_dist, _x, _y, _px, _py, mult)) >
+           tol * pow (10, 5);)        // finding point of crossing
     {
-        if (cos (mult * _x) * cos (mult * *temp_x) < 0)
+        if (func (_dist, _x, _y, _px, _py, mult) * func (dist + *temp, *temp_x,
+                                                         *temp_y, *temp_px,
+                                                         *temp_py, mult) <
+            0)
         {
             lx    = _x;
             ly    = _y;
@@ -126,8 +130,10 @@ void diagonal (
             lpy   = _py;
             lb    = _b;
             ldist = _dist;
-            _h    = fabs (cos (mult * _x)) /
-                 fabs (cos (mult * *temp_x) - cos (mult * _x)) *
+            _h    = fabs (func (_dist, _x, _y, _px, _py, mult)) /
+                 fabs (func (dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py,
+                             mult) -
+                       func (_dist, _x, _y, _px, _py, mult)) *
                  (dist + *temp - _dist);        // step from _x to startx
 
             RK (_dist, &_x, &_y, &_px, &_py, &_b, _h, s, k, cab, f, g, u, v, l,
@@ -143,8 +149,9 @@ void diagonal (
             *temp_b  = _b;
             *temp    = _dist - dist;
 
-            _h = fabs (cos (mult * lx)) /
-                 fabs (cos (mult * lx) - cos (mult * _x)) *
+            _h = fabs (func (ldist, lx, ly, lpx, lpy, mult)) /
+                 fabs (func (ldist, lx, ly, lpx, lpy, mult) -
+                       func (_dist, _x, _y, _px, _py, mult)) *
                  (_dist - ldist);        // step from lx to startx
 
             _x    = lx;
@@ -169,10 +176,11 @@ void diagonal (
 
     RK (dist, temp_x, temp_y, temp_px, temp_py, temp_b, *temp, s, k, cab, f, g,
         u, v, l, mult, *c, false);        // counting startx point
-    printf (
-        "Turning control point:\tt = %8.4f,\tX = %8.4f,\tY = %8.4f,\tPx = %8.4f,\tPy = %8.4f,\tB = %8.4f,\tDiscrepancy: %13e\n",
-        dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, *temp_b,
-        cos (mult * *temp_x));
+    if (print)
+        printf (
+            "Turning control point:\tt = %8.4f,\tX = %8.4f,\tY = %8.4f,\tPx = %8.4f,\tPy = %8.4f,\tB = %8.4f,\tDiscrepancy: %13e\n",
+            dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, *temp_b,
+            func (dist + *temp, *temp_x, *temp_y, *temp_px, *temp_py, mult));
 }
 
 // Adaptive Runge-Kutta
@@ -253,12 +261,12 @@ double astep (
             continue;
         }
 
-        if (print && fabs (cos (mult * *x)) > tol * pow (10, 4) &&
-            cos (mult * *x) * cos (mult * temp_x) < EPS)
+        if (fabs (cos (mult * *x)) > tol * pow (10, 6) &&
+            cos (mult * *x) * cos (mult * temp_x) < 0)
         {
             diagonal (dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px,
                       &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l,
-                      mult, *c);
+                      mult, *c, turn_x, print);
 
             x_  = *x;
             y_  = *y;
@@ -270,10 +278,37 @@ double astep (
                 mult, *c, true);
             norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
                          pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
-            c = (temp_py > 0)?control_p:control_m;
+            c    = (temp_py > 0) ? control_p : control_m;
         }
-        if (fabs(cos(mult * *x)) < tol * pow(10, 4) && fabs(cos(mult * temp_x)) > tol * pow(10, 4))
-            c = (cos(mult * temp_x) > 0)?control_n:(temp_py > 0)?control_p:control_m;
+        if (fabs (cos (mult * *x)) < tol * pow (10, 6) &&
+            fabs (cos (mult * temp_x)) > tol * pow (10, 6))
+            c = (cos (mult * temp_x) > 0) ? control_n
+                : (temp_py > 0)           ? control_p
+                                          : control_m;
+
+        if (fabs (*py) > tol * pow (10, 6) && *py * temp_py < 0)
+        {
+            diagonal (dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px,
+                      &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l,
+                      mult, *c, turn_py, print);
+
+            x_  = *x;
+            y_  = *y;
+            px_ = *px;
+            py_ = *py;
+            b_  = *b;
+
+            RK (dist, &x_, &y_, &px_, &py_, &b_, temp, s, k, cab, f, g, u, v, l,
+                mult, *c, true);
+            norm = sqrt (pow (temp_x - x_, 2) + pow (temp_y - y_, 2) +
+                         pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
+            c    = (cos (mult * temp_x) > 0) ? control_n : control_p;
+        }
+        if (fabs (*py) < tol * pow (10, 6) &&
+            fabs (temp_py) > tol * pow (10, 6))
+            c = (cos (mult * temp_x) > 0) ? control_n
+                : (temp_py > 0)           ? control_p
+                                          : control_m;
 
         err += norm;
         dist += temp;
