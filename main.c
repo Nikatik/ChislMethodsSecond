@@ -53,16 +53,18 @@ int main()
     {
         case -1: return -1;
         case -2: return -2;
-        default:;
+        default: printf ("File opened.\n");
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
     initialization (i, j, s, T_c, mult_c, &cab, &k, &T, &mult, &alpha);
+    printf ("All initialized.\n");
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
     reading (inpf, cab, s, i, j);
+    printf ("RK matrix readed.\n\n");
 
     // printing (cab, s, i, j);
 
@@ -102,6 +104,7 @@ int main()
     /////////////////////////////////////////////////////////////////////////////////////////
 
     cleaning (i, s, inpf, cab, k, T, mult, alpha);
+    printf ("All cleaned.\n");
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -180,8 +183,8 @@ void initialization (long long unsigned i, long long unsigned j, unsigned int s,
     *alpha      = (double*) malloc (6 * sizeof (double));
     (*alpha)[0] = (*mult)[0];
     (*alpha)[1] = (*T)[0];
-    (*alpha)[2] = -9.79;        // start value for shoting method
-    (*alpha)[3] = 3.87;         // start value for shoting method
+    (*alpha)[2] = -9.;        // start value for shoting method
+    (*alpha)[3] = 3.;         // start value for shoting method
 }
 
 // CAB matrix reading

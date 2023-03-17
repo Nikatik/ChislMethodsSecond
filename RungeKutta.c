@@ -117,7 +117,7 @@ void diagonal (
     double _x = x, _y = y, _px = px, _py = py, _b = b, _dist = dist, _h = *temp;
 
     for (; fabs (func (_dist, _x, _y, _px, _py, mult)) >
-           tol * pow (10, 5);)        // finding point of crossing
+           tol * pow (tol, -1. / 3.);)        // finding point of crossing
     {
         if (func (_dist, _x, _y, _px, _py, mult) * func (dist + *temp, *temp_x,
                                                          *temp_y, *temp_px,
@@ -246,7 +246,7 @@ double astep (
                      pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
         temp = h;
         h *= fmin (fac, fmax (0.7, pow (0.98 * tol / norm, 1. / (p + 1))));
-        if (h < pow (10, -18))
+        if (h < pow (10, -17))
         {
             // printf ("\nSomething goes wrong...\n");
             return -1000000;
@@ -264,7 +264,7 @@ double astep (
             continue;
         }
 
-        if (fabs (cos (mult * *x)) > tol * pow (10, 6) &&
+        if (fabs (cos (mult * *x)) > tol * pow (tol, -12. / 30.) &&
             cos (mult * *x) * cos (mult * temp_x) < 0)
         {
             diagonal (dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px,
@@ -283,13 +283,13 @@ double astep (
                          pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
             c    = (temp_py > 0) ? control_p : control_m;
         }
-        if (fabs (cos (mult * *x)) < tol * pow (10, 6) &&
-            fabs (cos (mult * temp_x)) > tol * pow (10, 6))
+        if (fabs (cos (mult * *x)) < tol * pow (tol, -12. / 30.) &&
+            fabs (cos (mult * temp_x)) > tol * pow (tol, -12. / 30.))
             c = (cos (mult * temp_x) > 0) ? control_n
                 : (temp_py > 0)           ? control_p
                                           : control_m;
 
-        if (fabs (*py) > tol * pow (10, 6) && *py * temp_py < 0)
+        if (fabs (*py) > tol * pow (tol, -12. / 30.) && *py * temp_py < 0)
         {
             diagonal (dist, *x, *y, *px, *py, *b, &temp_x, &temp_y, &temp_px,
                       &temp_py, &temp_b, &temp, s, k, cab, tol, f, g, u, v, l,
@@ -307,8 +307,8 @@ double astep (
                          pow (temp_px - px_, 2) + pow (temp_py - py_, 2));
             c    = (cos (mult * temp_x) > 0) ? control_n : control_p;
         }
-        if (fabs (*py) < tol * pow (10, 6) &&
-            fabs (temp_py) > tol * pow (10, 6))
+        if (fabs (*py) < tol * pow (tol, -12. / 30.) &&
+            fabs (temp_py) > tol * pow (tol, -12. / 30.))
             c = (cos (mult * temp_x) > 0) ? control_n
                 : (temp_py > 0)           ? control_p
                                           : control_m;

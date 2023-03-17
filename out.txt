@@ -1,52 +1,57 @@
+File opened.
+All initialized.
+RK matrix readed.
+
 The Runge-Kutta test:
--5.23e-13    -5.25e-13  |  -5.23e-13    -5.25e-13  |  0.0000000e+00  |  10^3*Pi
+-5.00e-13    3.49e-11  |  -5.00e-13    3.49e-11  |  0.0000000e+00  |  10^3*Pi
 
 
 -----------------------
-Turning control point:	t =   3.1416,	X =  -1.1588,	Y =   2.0508,	Px =   3.8703,	Py =   0.0000,	B =  67.0662,	Discrepancy:  1.360023e-15
-Shooting iteration: 418,
+Turning control point:	t =   3.1416,	X =  -1.1588,	Y =   2.0508,	Px =   3.8703,	Py =  -0.0000,	B = -47.0579,	Discrepancy: -1.814521e-15
+Shooting iteration: 395,
 Alpha: 0.0000,
 Distance: 4.0000,
-Y(0) = -9.79134142702180,
+Y(0) = -9.79134142702181,
 Px(0) = 3.87027034284934,
-B = 68.92903062695670,
-Discrepancy: 8.513e-15
+B = -42.57297377134262,
+Discrepancy: 1.649e-14
 
 
 -----------------------
-Turning control point:	t =   3.1416,	X =  -1.1589,	Y =   2.0509,	Px =   3.8703,	Py =  -0.0000,	B =  67.0664,	Discrepancy: -1.124101e-15
-Shooting iteration: 281,
+Turning control point:	t =   3.1416,	X =  -1.1589,	Y =   2.0509,	Px =   3.8703,	Py =   0.0000,	B = -47.0582,	Discrepancy:  5.204170e-16
+Shooting iteration: 273,
 Alpha: 0.0010,
 Distance: 4.0000,
-Y(0) = -9.79145876325196,
+Y(0) = -9.79145876325194,
 Px(0) = 3.87029979258469,
-B = 68.92932495041879,
-Discrepancy: 5.944e-15
+B = -42.57313574274610,
+Discrepancy: 9.451e-15
 
 
 -----------------------
-Turning control point:	t =   3.1410,	X =  -1.1629,	Y =   2.0566,	Px =   3.8735,	Py =   0.0000,	B =  67.0862,	Discrepancy:  6.383782e-16
-Shooting iteration: 331,
+Turning control point:	t =   3.1410,	X =  -1.1629,	Y =   2.0566,	Px =   3.8735,	Py =  -0.0000,	B = -47.0936,	Discrepancy: -5.551115e-16
+Shooting iteration: 320,
 Alpha: 0.0100,
 Distance: 4.0000,
-Y(0) = -9.80315488873587,
+Y(0) = -9.80315488873585,
 Px(0) = 3.87322698052975,
-B = 68.95900328493228,
-Discrepancy: 6.449e-15
+B = -42.58921358418818,
+Discrepancy: 2.087e-14
 
 
 -----------------------------------
 Newton's method does not converge!
-Turning control point:	t =   3.0730,	X =  -1.7726,	Y =   2.9125,	Px =   4.3673,	Py =  -0.0000,	B =  74.8030,	Discrepancy: -7.910339e-16
+Turning control point:	t =   3.0730,	X =  -1.7726,	Y =   2.9125,	Px =   4.3673,	Py =   0.0000,	B = -51.3505,	Discrepancy:  5.837969e-13
 Shooting iteration: 1501,
 Alpha:           0.0712,
 Requested alpha: 0.1000,
 Distance:           4.0000,
 Requested distance: 4.0000,
-Y(0) = -11.25713219171385,
-Px(0) = 4.12187823874943,
-B = 78.44227251397847,
-Discrepancy: 5.545e-15
+Y(0) = -11.25713219171399,
+Px(0) = 4.12187823874944,
+B = -43.60470831857397,
+Discrepancy: 2.178e-14
 Steps: 1.7716e-05   0.0000e+00
 
-34.93861 seconds
+24.65301 seconds
+All cleaned.

@@ -94,7 +94,7 @@ int shooting_method (
         integral = 0;
         alpha_1  = alpha[2];        // y
         alpha_2 =
-            alpha[3];               // px
+            alpha[3];        // px
                              //  printf("mult_0=%13.7e  |  mult_k=%13.7e  |
                              //  mult=%13.7e  |  T_0=%13.7e  |  T_k=%13.7e  |
                              //  T=%13.7e  |  step_m=%13.7e  |
@@ -263,7 +263,7 @@ int shooting_method (
             // %10.2e\n", A[0][0], A[0][1], B[0], A[1][0], A[1][1], B[1]);
 
             B[5] = sqrt (pow (B[0], 2) + pow (B[1], 2));
-            if (B[5] < tol * pow (10, 3))
+            if (B[5] < tol * pow (tol, -1. / 5.))
             {
                 // printf and break
                 // printf("Shooting iteration: %u,\nAlpha: %.4f,\nDistance:
@@ -290,8 +290,8 @@ int shooting_method (
                         (A[1][0] * A[0][1] - A[0][0] * A[1][1]);
 
             // demph
-
-            for (betta = 1;;)
+            betta = 1;
+            for (unsigned int counter = 0; counter < 1000; counter++)
             {
                 if (error (alpha[5], x, alpha_1 - betta * newton[0],
                            alpha_2 + betta * newton[1], py, integral, err, p, s,
