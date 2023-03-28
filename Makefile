@@ -1,6 +1,6 @@
 CC := cc
 CXX := c++
-SHELL := bash
+SHELL := $(shell whereis bash | awk '{print $$2}')
 
 COMPLIER := 0
 CSOURCES := $(shell find . -name '*.c')
